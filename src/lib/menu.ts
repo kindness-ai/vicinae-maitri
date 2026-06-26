@@ -119,3 +119,16 @@ export interface View extends Base {
 export type Node = Group | Cmd | Toggle | Launch | View;
 
 export const accent = Color.Blue;
+
+/** Find a node by id anywhere in the tree, recursing into statically-defined
+ * children (async-loaded children stay reachable via their own group node). */
+export function findNode(nodes: Node[], id: string): Node | undefined {
+  for (const node of nodes) {
+    if (node.id === id) return node;
+    if (node.type === "group" && Array.isArray(node.children)) {
+      const hit = findNode(node.children, id);
+      if (hit) return hit;
+    }
+  }
+  return undefined;
+}
