@@ -13,8 +13,18 @@ import {
   showToast,
   useNavigation,
 } from "@vicinae/api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { type Cmd, type Group, type Launch, type Node, type Toggle, ph, run, spawnDetached } from "./menu";
+import BackgroundPicker from "../background-picker";
+import ThemePicker from "../theme-picker";
+import UnlockPicker from "../unlock-picker";
+
+// In-extension views pushed from the menu (so pickers aren't separate root commands).
+const VIEWS: Record<string, () => ReactElement> = {
+  theme: ThemePicker,
+  background: BackgroundPicker,
+  unlock: UnlockPicker,
+};
 
 async function execNode(exec: string[], terminal: boolean | undefined, hud: string | undefined) {
   // Launch-and-leave: spawn DETACHED so the child survives the worker teardown
@@ -64,6 +74,20 @@ async function runLaunch(node: Launch) {
 
 function Row({ node, state, refresh }: { node: Node; state?: boolean; refresh: () => void }) {
   const { push } = useNavigation();
+
+  if (node.type === "view") {
+    const Comp = VIEWS[node.view];
+    return (
+      <List.Item
+        icon={ph(node.icon, Color.PrimaryText)}
+        title={node.title}
+        subtitle={node.subtitle}
+        keywords={node.keywords}
+        accessories={[{ icon: Icon.ChevronRight }]}
+        actions={<ActionPanel>{Comp ? <Action.Push title={`Open ${node.title}`} target={<Comp />} /> : null}</ActionPanel>}
+      />
+    );
+  }
 
   if (node.type === "group") {
     return (

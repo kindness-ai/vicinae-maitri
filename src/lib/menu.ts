@@ -107,6 +107,13 @@ export interface Launch extends Base {
   editor?: string; // path to open in the user's editor
 }
 
-export type Node = Group | Cmd | Toggle | Launch;
+/** Pushes an in-extension view component (keyed into the renderer's registry),
+ * so picker UIs live inside the menu instead of as separate root commands. */
+export interface View extends Base {
+  type: "view";
+  view: string;
+}
+
+export type Node = Group | Cmd | Toggle | Launch | View;
 
 export const accent = Color.Blue;

@@ -7,8 +7,8 @@ const DL = "vicinae://launch/@kindness-ai/maitri";
 // show_about_menu). The visual pickers are native extension commands; Hyprland
 // look & feel opens the config file in the user's editor; fonts are listed live.
 export const style: Node[] = [
-  { type: "launch", id: "theme", title: "Theme", icon: "palette", deeplink: `${DL}/theme-picker` },
-  { type: "launch", id: "unlock", title: "Unlock", icon: "lock-key", deeplink: `${DL}/unlock-picker` },
+  { type: "view", id: "theme", title: "Theme", icon: "palette", view: "theme" },
+  { type: "view", id: "unlock", title: "Unlock", icon: "lock-key", view: "unlock" },
   {
     type: "group",
     id: "font",
@@ -28,7 +28,7 @@ export const style: Node[] = [
         }));
     },
   },
-  { type: "launch", id: "background", title: "Background", icon: "image", deeplink: `${DL}/background-picker` },
+  { type: "view", id: "background", title: "Background", icon: "image", view: "background" },
   { type: "launch", id: "hyprland", title: "Hyprland", icon: "wrench", editor: "~/.config/hypr/looknfeel.conf" },
   {
     type: "group",
