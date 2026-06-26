@@ -16,19 +16,22 @@ import { useEffect, useState } from "react";
 import { type Cmd, type Group, type Launch, type Node, type Toggle, ph, run } from "./menu";
 
 async function execNode(exec: string[], terminal: boolean | undefined, hud: string | undefined) {
+  // IMPORTANT: run the command BEFORE closing the window. closeMainWindow() tears
+  // down the extension worker, so anything awaited after it never executes.
   if (terminal) {
-    // Hand off to maitri's floating-terminal presentation wrapper (interactive / sudo).
+    // Detached floating terminal (interactive / sudo): spawn, then close.
     await run(["maitri-launch-floating-terminal-with-presentation", exec.join(" ")]);
     await closeMainWindow();
     return;
   }
-  await closeMainWindow();
   const r = await run(exec);
-  if (r.ok) {
-    if (hud) await showHUD(hud);
-  } else {
+  if (!r.ok) {
     await showToast({ style: Toast.Style.Failure, title: "Command failed", message: r.stderr.slice(0, 200) });
+    return;
   }
+  // showHUD closes the window and shows the toast; otherwise just close.
+  if (hud) await showHUD(hud);
+  else await closeMainWindow();
 }
 
 async function runCmd(node: Cmd) {
@@ -47,11 +50,16 @@ async function runCmd(node: Cmd) {
 }
 
 async function runLaunch(node: Launch) {
-  await closeMainWindow();
-  if (node.deeplink) await run(["vicinae", node.deeplink]);
-  else if (node.app) await run(["gtk-launch", node.app]);
+  // Launch BEFORE any closeMainWindow (closing first kills the worker).
+  if (node.deeplink) {
+    // Opening another Vicinae command replaces this view — no close needed.
+    await run(["vicinae", node.deeplink]);
+    return;
+  }
+  if (node.app) await run(["gtk-launch", node.app]);
   else if (node.url) await run(["maitri-launch-webapp", node.url]);
   else if (node.editor) await run(["maitri-launch-editor", node.editor]);
+  await closeMainWindow();
 }
 
 function Row({ node, state, refresh }: { node: Node; state?: boolean; refresh: () => void }) {
