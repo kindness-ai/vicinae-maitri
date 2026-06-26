@@ -14,8 +14,13 @@ import {
   useNavigation,
 } from "@vicinae/api";
 import { useEffect, useState } from "react";
-import { type Cmd, type Group, type Launch, type Node, type Toggle, ph, run, spawnDetached } from "./menu";
+import { type Cmd, type Launch, type Node, type Toggle, ph, run, spawnDetached } from "./menu";
 import { VIEWS } from "./views";
+
+// A live trailing value (current selection, update badge) rendered as a tag.
+function accList(acc: string | null | undefined, color?: Color) {
+  return acc ? [{ tag: { value: acc, color: color ?? Color.SecondaryText } }] : [];
+}
 
 async function execNode(exec: string[], terminal: boolean | undefined, hud: string | undefined) {
   // Launch-and-leave: spawn DETACHED so the child survives the worker teardown
@@ -63,7 +68,17 @@ async function runLaunch(node: Launch) {
   await closeMainWindow();
 }
 
-function Row({ node, state, refresh }: { node: Node; state?: boolean; refresh: () => void }) {
+function Row({
+  node,
+  state,
+  acc,
+  refresh,
+}: {
+  node: Node;
+  state?: boolean;
+  acc?: string | null;
+  refresh: () => void;
+}) {
   const { push } = useNavigation();
 
   if (node.type === "view") {
@@ -74,7 +89,7 @@ function Row({ node, state, refresh }: { node: Node; state?: boolean; refresh: (
         title={node.title}
         subtitle={node.subtitle}
         keywords={node.keywords}
-        accessories={[{ icon: Icon.ChevronRight }]}
+        accessories={[...accList(acc, node.accessoryColor), { icon: Icon.ChevronRight }]}
         actions={<ActionPanel>{Comp ? <Action.Push title={`Open ${node.title}`} target={<Comp />} /> : null}</ActionPanel>}
       />
     );
@@ -87,7 +102,7 @@ function Row({ node, state, refresh }: { node: Node; state?: boolean; refresh: (
         title={node.title}
         subtitle={node.subtitle}
         keywords={node.keywords}
-        accessories={[{ icon: Icon.ChevronRight }]}
+        accessories={[...accList(acc, node.accessoryColor), { icon: Icon.ChevronRight }]}
         actions={
           <ActionPanel>
             <Action.Push
@@ -131,6 +146,7 @@ function Row({ node, state, refresh }: { node: Node; state?: boolean; refresh: (
         title={node.title}
         subtitle={node.subtitle}
         keywords={node.keywords}
+        accessories={accList(acc, node.accessoryColor)}
         actions={
           <ActionPanel>
             <Action title={node.title} onAction={() => runLaunch(node)} />
@@ -147,6 +163,7 @@ function Row({ node, state, refresh }: { node: Node; state?: boolean; refresh: (
       title={node.title}
       subtitle={node.subtitle}
       keywords={node.keywords}
+      accessories={accList(acc, node.accessoryColor)}
       actions={
         <ActionPanel>
           <Action
@@ -170,6 +187,7 @@ export function MenuList({
   const [items, setItems] = useState<Node[] | null>(Array.isArray(nodes) ? nodes : null);
   const [loading, setLoading] = useState(!Array.isArray(nodes));
   const [states, setStates] = useState<Record<string, boolean>>({});
+  const [accVals, setAccVals] = useState<Record<string, string | null>>({});
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
@@ -181,6 +199,7 @@ export function MenuList({
     }
   }, []);
 
+  // Resolve live toggle state.
   useEffect(() => {
     if (!items) return;
     const toggles = items.filter((n): n is Toggle => n.type === "toggle");
@@ -194,12 +213,26 @@ export function MenuList({
     };
   }, [items, tick]);
 
+  // Resolve live trailing accessories (current selection, update badge, …).
+  useEffect(() => {
+    if (!items) return;
+    const withAcc = items.filter((n) => typeof n.accessory === "function");
+    if (withAcc.length === 0) return;
+    let cancelled = false;
+    Promise.all(withAcc.map(async (n) => [n.id, await n.accessory?.()] as const)).then((entries) => {
+      if (!cancelled) setAccVals(Object.fromEntries(entries.map(([id, v]) => [id, v ?? null])));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [items, tick]);
+
   const refresh = () => setTick((t) => t + 1);
 
   return (
     <List navigationTitle={navigationTitle} isLoading={loading} searchBarPlaceholder={`Search ${navigationTitle}…`}>
       {(items ?? []).map((node) => (
-        <Row key={node.id} node={node} state={states[node.id]} refresh={refresh} />
+        <Row key={node.id} node={node} state={states[node.id]} acc={accVals[node.id]} refresh={refresh} />
       ))}
     </List>
   );

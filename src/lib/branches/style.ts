@@ -7,11 +7,12 @@ const DL = "vicinae://launch/@kindness-ai/maitri";
 // show_about_menu). The visual pickers are native extension commands; Hyprland
 // look & feel opens the config file in the user's editor; fonts are listed live.
 export const style: Node[] = [
-  { type: "view", id: "theme", title: "Theme", icon: "palette", view: "theme" },
+  { type: "view", id: "theme", title: "Theme", icon: "palette", view: "theme", accessory: async () => { const t = await capture(["maitri-theme-current"]); return t ? t.charAt(0).toUpperCase() + t.slice(1) : null; } },
   { type: "view", id: "unlock", title: "Unlock", icon: "lock-key", view: "unlock" },
   {
     type: "group",
     id: "font",
+    accessory: async () => (await capture(["maitri-font-current"])) || null,
     title: "Font",
     icon: "text-aa",
     children: async () => {

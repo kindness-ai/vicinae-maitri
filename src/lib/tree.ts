@@ -1,4 +1,5 @@
-import type { Node } from "./menu";
+import { type Node, run } from "./menu";
+import { Color } from "@vicinae/api";
 import { install } from "./branches/install";
 import { learn } from "./branches/learn";
 import { remove } from "./branches/remove";
@@ -17,7 +18,12 @@ export const root: Node[] = [
   { type: "group", id: "setup", title: "Setup", icon: "sliders-horizontal", subtitle: "Audio, network, defaults, security", children: setup },
   { type: "group", id: "install", title: "Install", icon: "package", subtitle: "Packages, apps, dev environments", children: install },
   { type: "group", id: "remove", title: "Remove", icon: "trash", subtitle: "Uninstall packages and apps", children: remove },
-  { type: "group", id: "update", title: "Update", icon: "arrows-clockwise", subtitle: "maitri, config, firmware, time", children: update },
+  {
+    type: "group", id: "update", title: "Update", icon: "arrows-clockwise",
+    subtitle: "maitri, config, firmware, time", children: update,
+    accessory: async () => ((await run(["maitri-update-available"])).ok ? "Update available" : null),
+    accessoryColor: Color.Orange,
+  },
   { type: "cmd", id: "about", title: "About", icon: "info", subtitle: "About this machine", exec: ["maitri-launch-about"] },
   { type: "group", id: "system", title: "System", icon: "power", subtitle: "Lock, suspend, restart, shutdown", children: system },
 ];

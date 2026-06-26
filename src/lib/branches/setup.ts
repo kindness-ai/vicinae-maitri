@@ -21,6 +21,7 @@ async function browserDesktopExists(desktop: string): Promise<boolean> {
 const defaultBrowserMenu: Node = {
   type: "group",
   id: "setup-default-browser",
+  accessory: async () => { const v = await capture(["maitri-default-browser"]); return v ? v.replace(/\.desktop$/, "") : null; },
   title: "Browser",
   icon: "globe",
   children: async () => {
@@ -52,6 +53,7 @@ const defaultBrowserMenu: Node = {
 const defaultTerminalMenu: Node = {
   type: "group",
   id: "setup-default-terminal",
+  accessory: async () => (await capture(["maitri-default-terminal"])) || null,
   title: "Terminal",
   icon: "terminal-window",
   children: async () => {
@@ -80,6 +82,7 @@ const defaultTerminalMenu: Node = {
 const defaultEditorMenu: Node = {
   type: "group",
   id: "setup-default-editor",
+  accessory: async () => (await capture(["maitri-default-editor"])) || null,
   title: "Editor",
   icon: "code",
   children: async () => {
@@ -120,6 +123,7 @@ const defaultMenu: Node = {
 const powerMenu: Node = {
   type: "group",
   id: "setup-power",
+  accessory: async () => (await capture(["powerprofilesctl", "get"])) || null,
   title: "Power Profile",
   icon: "lightning",
   children: async () => {

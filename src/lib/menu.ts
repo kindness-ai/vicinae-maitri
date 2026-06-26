@@ -70,6 +70,8 @@ interface Base {
   icon: string; // phosphor icon name
   subtitle?: string;
   keywords?: string[]; // extra search terms
+  accessory?: () => Promise<string | null>; // live trailing value (current selection, "Update available", …)
+  accessoryColor?: Color;
 }
 
 /** A submenu: pushes a child list. children may be static or loaded on demand. */
