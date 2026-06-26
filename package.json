@@ -4,7 +4,10 @@
   "version": "0.1.0",
   "title": "maitri",
   "description": "maitri desktop commands for Vicinae",
-  "categories": ["Applications", "Productivity"],
+  "categories": [
+    "Applications",
+    "Productivity"
+  ],
   "license": "MIT",
   "author": "kindness-ai",
   "icon": "icon.png",
@@ -28,13 +31,6 @@
       "title": "Set maitri Lock Screen",
       "subtitle": "maitri",
       "description": "Pick a Plymouth unlock screen from a visual grid",
-      "mode": "view"
-    },
-    {
-      "name": "set-reminder",
-      "title": "Set maitri Reminder",
-      "subtitle": "maitri",
-      "description": "Schedule a reminder after a number of minutes",
       "mode": "view"
     }
   ],
