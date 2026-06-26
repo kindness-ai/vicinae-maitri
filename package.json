@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/vicinaehq/vicinae/refs/heads/main/extra/schemas/extension.json",
   "name": "maitri",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "title": "maitri",
   "description": "maitri desktop commands for Vicinae",
   "categories": [
