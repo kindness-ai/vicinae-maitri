@@ -46,6 +46,22 @@ function matches(entry: Entry, query: string): boolean {
     .every((w) => hay.includes(w));
 }
 
+// Rank matches so the menu you're after comes first: a node whose own title carries
+// the query beats one that only matched via its breadcrumb/keywords, exact/prefix
+// title beats a substring, and shallower (top-level) menus beat deep leaves. Ties keep
+// the natural tree order since Array.sort is stable.
+function rank(entry: Entry, query: string): number {
+  const q = query.toLowerCase().trim();
+  const words = q.split(/\s+/).filter(Boolean);
+  const title = entry.node.title.toLowerCase();
+  let score = 0;
+  if (title === q) score += 1000;
+  else if (title.startsWith(q)) score += 600;
+  else if (words.every((w) => title.includes(w))) score += 300;
+  score -= entry.trail.length * 40;
+  return score;
+}
+
 async function execNode(exec: string[], terminal: boolean | undefined, hud: string | undefined) {
   // Launch-and-leave: spawn DETACHED so the child survives the worker teardown
   // that closeMainWindow() triggers, then close immediately. Awaiting the child
@@ -261,7 +277,9 @@ export function MenuList({
   // flattened matches across the whole tree, with breadcrumb context.
   const q = query.trim();
   const displayed: Entry[] =
-    global && q ? flat.filter((e) => matches(e, q)) : (items ?? []).map((node) => ({ node, trail: [] }));
+    global && q
+      ? flat.filter((e) => matches(e, q)).sort((a, b) => rank(b, q) - rank(a, q))
+      : (items ?? []).map((node) => ({ node, trail: [] }));
 
   return (
     <List
