@@ -15,7 +15,6 @@ export const remove: Node[] = [
         exec: ["maitri-pkg-remove"],
         terminal: true,
         destructive: true,
-        confirm: { title: "Remove Package?" },
       },
       {
         type: "cmd",
@@ -25,7 +24,6 @@ export const remove: Node[] = [
         exec: ["maitri-webapp-remove"],
         terminal: true,
         destructive: true,
-        confirm: { title: "Remove Web App?" },
       },
       {
         type: "cmd",
@@ -35,7 +33,6 @@ export const remove: Node[] = [
         exec: ["maitri-tui-remove"],
         terminal: true,
         destructive: true,
-        confirm: { title: "Remove TUI?" },
       },
       {
         type: "group",
@@ -51,7 +48,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-dev-env", "ruby"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Ruby on Rails?" },
           },
           {
             type: "group",
@@ -67,7 +63,6 @@ export const remove: Node[] = [
                 exec: ["maitri-remove-dev-env", "node"],
                 terminal: true,
                 destructive: true,
-                confirm: { title: "Remove Node.js?" },
               },
               {
                 type: "cmd",
@@ -77,7 +72,6 @@ export const remove: Node[] = [
                 exec: ["maitri-remove-dev-env", "bun"],
                 terminal: true,
                 destructive: true,
-                confirm: { title: "Remove Bun?" },
               },
               {
                 type: "cmd",
@@ -87,7 +81,6 @@ export const remove: Node[] = [
                 exec: ["maitri-remove-dev-env", "deno"],
                 terminal: true,
                 destructive: true,
-                confirm: { title: "Remove Deno?" },
               },
             ],
           },
@@ -99,7 +92,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-dev-env", "go"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Go?" },
           },
           {
             type: "group",
@@ -115,7 +107,6 @@ export const remove: Node[] = [
                 exec: ["maitri-remove-dev-env", "php"],
                 terminal: true,
                 destructive: true,
-                confirm: { title: "Remove PHP?" },
               },
               {
                 type: "cmd",
@@ -125,7 +116,6 @@ export const remove: Node[] = [
                 exec: ["maitri-remove-dev-env", "laravel"],
                 terminal: true,
                 destructive: true,
-                confirm: { title: "Remove Laravel?" },
               },
               {
                 type: "cmd",
@@ -135,7 +125,6 @@ export const remove: Node[] = [
                 exec: ["maitri-remove-dev-env", "symfony"],
                 terminal: true,
                 destructive: true,
-                confirm: { title: "Remove Symfony?" },
               },
             ],
           },
@@ -147,7 +136,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-dev-env", "python"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Python?" },
           },
           {
             type: "group",
@@ -163,7 +151,6 @@ export const remove: Node[] = [
                 exec: ["maitri-remove-dev-env", "elixir"],
                 terminal: true,
                 destructive: true,
-                confirm: { title: "Remove Elixir?" },
               },
               {
                 type: "cmd",
@@ -173,7 +160,6 @@ export const remove: Node[] = [
                 exec: ["maitri-remove-dev-env", "phoenix"],
                 terminal: true,
                 destructive: true,
-                confirm: { title: "Remove Phoenix?" },
               },
             ],
           },
@@ -185,7 +171,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-dev-env", "zig"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Zig?" },
           },
           {
             type: "cmd",
@@ -195,7 +180,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-dev-env", "rust"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Rust?" },
           },
           {
             type: "cmd",
@@ -205,7 +189,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-dev-env", "java"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Java?" },
           },
           {
             type: "cmd",
@@ -215,7 +198,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-dev-env", "dotnet"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove .NET?" },
           },
           {
             type: "cmd",
@@ -225,7 +207,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-dev-env", "ocaml"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove OCaml?" },
           },
           {
             type: "cmd",
@@ -235,7 +216,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-dev-env", "clojure"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Clojure?" },
           },
           {
             type: "cmd",
@@ -245,7 +225,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-dev-env", "scala"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Scala?" },
           },
         ],
       },
@@ -257,7 +236,6 @@ export const remove: Node[] = [
         exec: ["maitri-theme-remove"],
         terminal: true,
         destructive: true,
-        confirm: { title: "Remove Theme?" },
       },
       {
         type: "group",
@@ -273,7 +251,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-browser", "chrome"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Chrome?" },
           },
           {
             type: "cmd",
@@ -283,7 +260,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-browser", "edge"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Edge?" },
           },
           {
             type: "cmd",
@@ -293,7 +269,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-browser", "brave"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Brave?" },
           },
           {
             type: "cmd",
@@ -303,7 +278,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-browser", "brave-origin"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Brave Origin?" },
           },
           {
             type: "cmd",
@@ -313,7 +287,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-browser", "firefox"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Firefox?" },
           },
           {
             type: "cmd",
@@ -323,7 +296,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-browser", "zen"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Zen?" },
           },
         ],
       },
@@ -335,7 +307,6 @@ export const remove: Node[] = [
         exec: ["maitri-voxtype-remove"],
         terminal: true,
         destructive: true,
-        confirm: { title: "Remove Dictation?" },
       },
       {
         type: "group",
@@ -351,7 +322,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-gaming-steam"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Steam?" },
           },
           {
             type: "cmd",
@@ -361,7 +331,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-gaming-retroarch"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove RetroArch?" },
           },
           {
             type: "cmd",
@@ -371,7 +340,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-gaming-minecraft"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Minecraft?" },
           },
           {
             type: "cmd",
@@ -381,7 +349,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-gaming-geforce-now"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove NVIDIA GeForce NOW?" },
           },
           {
             type: "cmd",
@@ -391,7 +358,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-gaming-xbox-cloud"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Xbox Cloud Gaming?" },
           },
           {
             type: "cmd",
@@ -401,7 +367,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-gaming-xbox-controllers"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Xbox Controller?" },
           },
           {
             type: "cmd",
@@ -411,7 +376,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-gaming-moonlight"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Moonlight?" },
           },
           {
             type: "cmd",
@@ -421,7 +385,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-gaming-lutris"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Lutris?" },
           },
           {
             type: "cmd",
@@ -431,7 +394,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-gaming-heroic"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Heroic?" },
           },
         ],
       },
@@ -443,7 +405,6 @@ export const remove: Node[] = [
         exec: ["maitri-windows-vm", "remove"],
         terminal: true,
         destructive: true,
-        confirm: { title: "Remove Windows?" },
       },
       {
         type: "cmd",
@@ -453,7 +414,6 @@ export const remove: Node[] = [
         exec: ["maitri-remove-preinstalls"],
         terminal: true,
         destructive: true,
-        confirm: { title: "Remove Preinstalls?" },
       },
       {
         type: "group",
@@ -469,7 +429,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-security-fingerprint"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Fingerprint?" },
           },
           {
             type: "cmd",
@@ -479,7 +438,6 @@ export const remove: Node[] = [
             exec: ["maitri-remove-security-fido2"],
             terminal: true,
             destructive: true,
-            confirm: { title: "Remove Fido2?" },
           },
         ],
       },
