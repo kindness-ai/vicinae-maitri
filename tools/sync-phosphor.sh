@@ -16,7 +16,7 @@ if [[ ! -d $SRC ]]; then
   exit 1
 fi
 
-names=$(grep -rhoE 'icon:[[:space:]]*"[^"]+"' src | sed -E 's/.*"([^"]+)".*/\1/' | sort -u)
+names=$( { grep -rhoE 'icon:[[:space:]]*"[^"]+"' src; grep -rhoE 'ph\("[^"]+"' src; } | sed -E 's/.*"([^"]+).*/\1/' | sort -u)
 
 rm -rf "$DEST"
 mkdir -p "$DEST"
