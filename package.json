@@ -39,6 +39,13 @@
       "subtitle": "maitri",
       "description": "Pick a Plymouth unlock screen from a visual grid",
       "mode": "view"
+    },
+    {
+      "name": "keybindings",
+      "title": "maitri Keybindings",
+      "subtitle": "maitri",
+      "description": "Searchable Hyprland keybindings",
+      "mode": "view"
     }
   ],
   "preferences": [],
