@@ -13,6 +13,13 @@
   "icon": "icon.png",
   "commands": [
     {
+      "name": "maitri-menu",
+      "title": "maitri Menu",
+      "subtitle": "maitri",
+      "description": "The maitri control menu (apps, style, toggles, system\u2026)",
+      "mode": "view"
+    },
+    {
       "name": "theme-picker",
       "title": "Set maitri Theme",
       "subtitle": "maitri",
