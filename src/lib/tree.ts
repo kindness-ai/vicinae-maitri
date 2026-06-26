@@ -10,7 +10,7 @@ import { update } from "./branches/update";
 
 // The maitri menu root — mirrors show_main_menu in bin/maitri-menu, same order.
 export const root: Node[] = [
-  { type: "launch", id: "apps", title: "Apps", icon: "squares-four", subtitle: "Launch an application", deeplink: "vicinae://toggle" },
+  { type: "launch", id: "search", title: "Search", icon: "magnifying-glass", subtitle: "Apps, commands, and more", root: true },
   { type: "group", id: "learn", title: "Learn", icon: "graduation-cap", subtitle: "Keybindings, docs", children: learn },
   { type: "group", id: "trigger", title: "Trigger", icon: "lightning", subtitle: "Capture, share, toggles, hardware", children: trigger },
   { type: "group", id: "style", title: "Style", icon: "palette", subtitle: "Theme, background, font, lock screen", children: style },

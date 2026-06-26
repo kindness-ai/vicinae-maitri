@@ -100,6 +100,7 @@ export interface Toggle extends Base {
 /** Opens something: a Vicinae deeplink, an app, a URL, or a config file in the editor. */
 export interface Launch extends Base {
   type: "launch";
+  root?: boolean; // open Vicinae's main search (popToRoot)
   deeplink?: string;
   app?: string;
   url?: string;

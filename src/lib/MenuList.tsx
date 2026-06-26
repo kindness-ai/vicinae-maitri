@@ -8,6 +8,7 @@ import {
   Toast,
   closeMainWindow,
   confirmAlert,
+  popToRoot,
   showHUD,
   showToast,
   useNavigation,
@@ -44,6 +45,11 @@ async function runCmd(node: Cmd) {
 }
 
 async function runLaunch(node: Launch) {
+  // Drop back to Vicinae's main search (apps + all commands).
+  if (node.root) {
+    await popToRoot();
+    return;
+  }
   // Opening another Vicinae command replaces this view (fast) — no close needed.
   if (node.deeplink) {
     await run(["vicinae", node.deeplink]);
