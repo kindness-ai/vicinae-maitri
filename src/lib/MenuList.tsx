@@ -13,23 +13,17 @@ import {
   useNavigation,
 } from "@vicinae/api";
 import { useEffect, useState } from "react";
-import { type Cmd, type Group, type Launch, type Node, type Toggle, ph, run } from "./menu";
+import { type Cmd, type Group, type Launch, type Node, type Toggle, ph, run, spawnDetached } from "./menu";
 
 async function execNode(exec: string[], terminal: boolean | undefined, hud: string | undefined) {
-  // IMPORTANT: run the command BEFORE closing the window. closeMainWindow() tears
-  // down the extension worker, so anything awaited after it never executes.
+  // Launch-and-leave: spawn DETACHED so the child survives the worker teardown
+  // that closeMainWindow() triggers, then close immediately. Awaiting the child
+  // would hold the menu open until the launched app/terminal exits.
   if (terminal) {
-    // Detached floating terminal (interactive / sudo): spawn, then close.
-    await run(["maitri-launch-floating-terminal-with-presentation", exec.join(" ")]);
-    await closeMainWindow();
-    return;
+    spawnDetached(["maitri-launch-floating-terminal-with-presentation", exec.join(" ")]);
+  } else {
+    spawnDetached(exec);
   }
-  const r = await run(exec);
-  if (!r.ok) {
-    await showToast({ style: Toast.Style.Failure, title: "Command failed", message: r.stderr.slice(0, 200) });
-    return;
-  }
-  // showHUD closes the window and shows the toast; otherwise just close.
   if (hud) await showHUD(hud);
   else await closeMainWindow();
 }
@@ -50,15 +44,15 @@ async function runCmd(node: Cmd) {
 }
 
 async function runLaunch(node: Launch) {
-  // Launch BEFORE any closeMainWindow (closing first kills the worker).
+  // Opening another Vicinae command replaces this view (fast) — no close needed.
   if (node.deeplink) {
-    // Opening another Vicinae command replaces this view — no close needed.
     await run(["vicinae", node.deeplink]);
     return;
   }
-  if (node.app) await run(["gtk-launch", node.app]);
-  else if (node.url) await run(["maitri-launch-webapp", node.url]);
-  else if (node.editor) await run(["maitri-launch-editor", node.editor]);
+  // External launches are fire-and-forget: spawn detached, then close now.
+  if (node.app) spawnDetached(["gtk-launch", node.app]);
+  else if (node.url) spawnDetached(["maitri-launch-webapp", node.url]);
+  else if (node.editor) spawnDetached(["maitri-launch-editor", node.editor]);
   await closeMainWindow();
 }
 

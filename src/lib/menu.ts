@@ -1,6 +1,6 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { execFile } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import { promisify } from "node:util";
 import { Color, Image } from "@vicinae/api";
 
@@ -48,6 +48,18 @@ export async function flagSet(flag: string): Promise<boolean> {
 /** True when a process with the given name is running. */
 export async function processRunning(name: string): Promise<boolean> {
   return (await run(["pgrep", "-x", name])).ok;
+}
+
+/** Fire a command detached (survives the extension worker teardown) and return
+ * immediately — for launch-and-leave actions where the menu should close now. */
+export function spawnDetached(argv: string[]): void {
+  const [cmd, ...rest] = argv;
+  const child = spawn(resolveExe(cmd), rest, {
+    detached: true,
+    stdio: "ignore",
+    env: { ...process.env, PATH: `${join(MAITRI, "bin")}:${process.env.PATH ?? ""}` },
+  });
+  child.unref();
 }
 
 // ---- Menu node model -------------------------------------------------------
