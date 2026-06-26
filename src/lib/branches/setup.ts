@@ -206,7 +206,7 @@ const configMenu: Node = {
     { type: "launch", id: "setup-config-hyprlock", title: "Hyprlock", icon: "lock", editor: "~/.config/hypr/hyprlock.conf" },
     { type: "launch", id: "setup-config-hyprsunset", title: "Hyprsunset", icon: "sun-horizon", editor: "~/.config/hypr/hyprsunset.conf" },
     { type: "launch", id: "setup-config-swayosd", title: "Swayosd", icon: "sliders-horizontal", editor: "~/.config/swayosd/config.toml" },
-    { type: "launch", id: "setup-config-walker", title: "Walker", icon: "selection", editor: "~/.config/walker/config.toml" },
+    { type: "launch", id: "setup-config-vicinae", title: "Vicinae", icon: "rocket-launch", editor: "~/.config/vicinae/settings.json" },
     { type: "launch", id: "setup-config-waybar", title: "Waybar", icon: "sidebar-simple", editor: "~/.config/waybar/config.jsonc" },
     { type: "launch", id: "setup-config-xcompose", title: "XCompose", icon: "keyboard", editor: "~/.config/X11/Xcompose" },
   ],
