@@ -1,0 +1,81 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build extension
+        run: npm run build
+
+      # `vici build` installs the extension into the user's data dir rather than a
+      # local dist/. On Linux runners that resolves to
+      # $HOME/.local/share/vicinae/extensions/maitri. If a future @vicinae/api
+      # changes that path, the fallback below searches for the installed dir
+      # (identified by its package.json "name": "maitri") anywhere under the
+      # extensions root.
+      - name: Locate built extension
+        id: locate
+        run: |
+          set -euo pipefail
+          EXT_ROOT="$HOME/.local/share/vicinae/extensions"
+          EXT_DIR="$EXT_ROOT/maitri"
+
+          if [ ! -f "$EXT_DIR/package.json" ]; then
+            echo "Expected build output at $EXT_DIR not found; searching $EXT_ROOT" >&2
+            EXT_DIR="$(dirname "$(grep -rl --include=package.json '"name": "maitri"' "$EXT_ROOT" | head -n1)")"
+          fi
+
+          if [ -z "${EXT_DIR:-}" ] || [ ! -f "$EXT_DIR/package.json" ]; then
+            echo "Could not locate the built maitri extension under $EXT_ROOT" >&2
+            ls -laR "$EXT_ROOT" || true
+            exit 1
+          fi
+
+          echo "Found built extension at $EXT_DIR"
+          ls -la "$EXT_DIR"
+          echo "ext_dir=$EXT_DIR" >> "$GITHUB_OUTPUT"
+
+      # tar from inside the extension dir so the archive contents sit at the root
+      # and unpack directly into a target dir (e.g. tar -xzf ... -C <target>).
+      - name: Package extension
+        id: package
+        run: |
+          set -euo pipefail
+          EXT_DIR="${{ steps.locate.outputs.ext_dir }}"
+          TARBALL="maitri-vicinae-extension.tar.gz"
+          tar -czf "$GITHUB_WORKSPACE/$TARBALL" -C "$EXT_DIR" .
+          cd "$GITHUB_WORKSPACE"
+          sha256sum "$TARBALL" > "$TARBALL.sha256"
+          echo "Packaged:"
+          ls -la "$TARBALL" "$TARBALL.sha256"
+          cat "$TARBALL.sha256"
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            maitri-vicinae-extension.tar.gz
+            maitri-vicinae-extension.tar.gz.sha256
