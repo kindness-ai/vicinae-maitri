@@ -13,13 +13,37 @@ import {
   showToast,
   useNavigation,
 } from "@vicinae/api";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { type Cmd, type Launch, type Node, type Toggle, ph, run, spawnDetached } from "./menu";
 import { VIEWS } from "./views";
 
 // A live trailing value (current selection, update badge) rendered as a tag.
 function accList(acc: string | null | undefined, color?: Color) {
   return acc ? [{ tag: { value: acc, color: color ?? Color.SecondaryText } }] : [];
+}
+
+type Entry = { node: Node; trail: string[] };
+
+// Flatten the tree into every node + its breadcrumb trail, recursing only into
+// statically-defined children (async children stay navigable via their group).
+function flattenAll(nodes: Node[], trail: string[] = []): Entry[] {
+  const out: Entry[] = [];
+  for (const node of nodes) {
+    out.push({ node, trail });
+    if (node.type === "group" && Array.isArray(node.children)) {
+      out.push(...flattenAll(node.children, [...trail, node.title]));
+    }
+  }
+  return out;
+}
+
+function matches(entry: Entry, query: string): boolean {
+  const hay = `${entry.node.title} ${entry.trail.join(" ")} ${entry.node.keywords?.join(" ") ?? ""}`.toLowerCase();
+  return query
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean)
+    .every((w) => hay.includes(w));
 }
 
 async function execNode(exec: string[], terminal: boolean | undefined, hud: string | undefined) {
@@ -51,17 +75,14 @@ async function runCmd(node: Cmd) {
 }
 
 async function runLaunch(node: Launch) {
-  // Drop back to Vicinae's main search (apps + all commands).
   if (node.root) {
     await popToRoot();
     return;
   }
-  // Opening another Vicinae command replaces this view (fast) — no close needed.
   if (node.deeplink) {
     await run(["vicinae", node.deeplink]);
     return;
   }
-  // External launches are fire-and-forget: spawn detached, then close now.
   if (node.app) spawnDetached(["gtk-launch", node.app]);
   else if (node.url) spawnDetached(["maitri-launch-webapp", node.url]);
   else if (node.editor) spawnDetached(["maitri-launch-editor", node.editor]);
@@ -72,14 +93,16 @@ function Row({
   node,
   state,
   acc,
+  breadcrumb,
   refresh,
 }: {
   node: Node;
   state?: boolean;
   acc?: string | null;
+  breadcrumb?: string;
   refresh: () => void;
 }) {
-  const { push } = useNavigation();
+  const subtitle = breadcrumb || node.subtitle;
 
   if (node.type === "view") {
     const Comp = VIEWS[node.view];
@@ -87,7 +110,7 @@ function Row({
       <List.Item
         icon={ph(node.icon, Color.PrimaryText)}
         title={node.title}
-        subtitle={node.subtitle}
+        subtitle={subtitle}
         keywords={node.keywords}
         accessories={[...accList(acc, node.accessoryColor), { icon: Icon.ChevronRight }]}
         actions={<ActionPanel>{Comp ? <Action.Push title={`Open ${node.title}`} target={<Comp />} /> : null}</ActionPanel>}
@@ -100,7 +123,7 @@ function Row({
       <List.Item
         icon={ph(node.icon, Color.PrimaryText)}
         title={node.title}
-        subtitle={node.subtitle}
+        subtitle={subtitle}
         keywords={node.keywords}
         accessories={[...accList(acc, node.accessoryColor), { icon: Icon.ChevronRight }]}
         actions={
@@ -121,7 +144,7 @@ function Row({
       <List.Item
         icon={ph(node.icon, Color.PrimaryText)}
         title={node.title}
-        subtitle={node.subtitle}
+        subtitle={subtitle}
         keywords={node.keywords}
         accessories={[{ tag: { value: on ? (node.onLabel ?? "On") : (node.offLabel ?? "Off"), color: on ? Color.Green : Color.SecondaryText } }]}
         actions={
@@ -144,7 +167,7 @@ function Row({
       <List.Item
         icon={ph(node.icon, Color.PrimaryText)}
         title={node.title}
-        subtitle={node.subtitle}
+        subtitle={subtitle}
         keywords={node.keywords}
         accessories={accList(acc, node.accessoryColor)}
         actions={
@@ -161,7 +184,7 @@ function Row({
     <List.Item
       icon={ph(node.icon, node.destructive ? Color.Red : Color.PrimaryText)}
       title={node.title}
-      subtitle={node.subtitle}
+      subtitle={subtitle}
       keywords={node.keywords}
       accessories={accList(acc, node.accessoryColor)}
       actions={
@@ -180,14 +203,17 @@ function Row({
 export function MenuList({
   navigationTitle,
   nodes,
+  global,
 }: {
   navigationTitle: string;
   nodes: Node[] | (() => Promise<Node[]>);
+  global?: boolean; // root menu: search jumps to any action across the whole tree
 }) {
   const [items, setItems] = useState<Node[] | null>(Array.isArray(nodes) ? nodes : null);
   const [loading, setLoading] = useState(!Array.isArray(nodes));
   const [states, setStates] = useState<Record<string, boolean>>({});
   const [accVals, setAccVals] = useState<Record<string, string | null>>({});
+  const [query, setQuery] = useState("");
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
@@ -199,10 +225,13 @@ export function MenuList({
     }
   }, []);
 
-  // Resolve live toggle state.
+  // For a global menu, index every node once; otherwise just the current level.
+  const flat = useMemo(() => (global && items ? flattenAll(items) : []), [global, items]);
+  const resolveNodes = global ? flat.map((e) => e.node) : (items ?? []);
+
+  // Resolve live toggle state for everything we might show.
   useEffect(() => {
-    if (!items) return;
-    const toggles = items.filter((n): n is Toggle => n.type === "toggle");
+    const toggles = resolveNodes.filter((n): n is Toggle => n.type === "toggle");
     if (toggles.length === 0) return;
     let cancelled = false;
     Promise.all(toggles.map(async (t) => [t.id, await t.isOn()] as const)).then((entries) => {
@@ -215,8 +244,7 @@ export function MenuList({
 
   // Resolve live trailing accessories (current selection, update badge, …).
   useEffect(() => {
-    if (!items) return;
-    const withAcc = items.filter((n) => typeof n.accessory === "function");
+    const withAcc = resolveNodes.filter((n) => typeof n.accessory === "function");
     if (withAcc.length === 0) return;
     let cancelled = false;
     Promise.all(withAcc.map(async (n) => [n.id, await n.accessory?.()] as const)).then((entries) => {
@@ -229,10 +257,29 @@ export function MenuList({
 
   const refresh = () => setTick((t) => t + 1);
 
+  // Empty query (or non-global) → current level. Typed query on a global menu →
+  // flattened matches across the whole tree, with breadcrumb context.
+  const q = query.trim();
+  const displayed: Entry[] =
+    global && q ? flat.filter((e) => matches(e, q)) : (items ?? []).map((node) => ({ node, trail: [] }));
+
   return (
-    <List navigationTitle={navigationTitle} isLoading={loading} searchBarPlaceholder={`Search ${navigationTitle}…`}>
-      {(items ?? []).map((node) => (
-        <Row key={node.id} node={node} state={states[node.id]} acc={accVals[node.id]} refresh={refresh} />
+    <List
+      navigationTitle={navigationTitle}
+      isLoading={loading}
+      searchBarPlaceholder={global ? "Search maitri…" : `Search ${navigationTitle}…`}
+      filtering={global ? false : undefined}
+      onSearchTextChange={global ? setQuery : undefined}
+    >
+      {displayed.map(({ node, trail }) => (
+        <Row
+          key={node.id}
+          node={node}
+          state={states[node.id]}
+          acc={accVals[node.id]}
+          breadcrumb={trail.length ? trail.join(" › ") : undefined}
+          refresh={refresh}
+        />
       ))}
     </List>
   );

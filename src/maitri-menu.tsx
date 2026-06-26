@@ -11,5 +11,5 @@ export default function MaitriMenu(props: LaunchProps) {
     const Comp = VIEWS[view];
     return <Comp />;
   }
-  return <MenuList navigationTitle="maitri" nodes={root} />;
+  return <MenuList navigationTitle="maitri" nodes={root} global />;
 }
