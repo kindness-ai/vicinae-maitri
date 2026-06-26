@@ -13,18 +13,9 @@ import {
   showToast,
   useNavigation,
 } from "@vicinae/api";
-import { useEffect, useState, type ReactElement } from "react";
+import { useEffect, useState } from "react";
 import { type Cmd, type Group, type Launch, type Node, type Toggle, ph, run, spawnDetached } from "./menu";
-import BackgroundPicker from "../background-picker";
-import ThemePicker from "../theme-picker";
-import UnlockPicker from "../unlock-picker";
-
-// In-extension views pushed from the menu (so pickers aren't separate root commands).
-const VIEWS: Record<string, () => ReactElement> = {
-  theme: ThemePicker,
-  background: BackgroundPicker,
-  unlock: UnlockPicker,
-};
+import { VIEWS } from "./views";
 
 async function execNode(exec: string[], terminal: boolean | undefined, hud: string | undefined) {
   // Launch-and-leave: spawn DETACHED so the child survives the worker teardown
